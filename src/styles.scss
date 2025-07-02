@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+@use './styles/partials/font' as *;
+@use './styles/partials/variables' as *;
+@use './styles/partials/reset' as *;
+
+
+:root {
+  --bg: #f2f2f2;
+  --element-bg: #ffffff;
+  --text: #111517;
+  --input-bg: #8585851a;
+}
+
+.dark-theme {
+  --bg: #202C36;
+  --element-bg: #2b3945;
+  --text: #ffffff;
+  --input-bg: #2b3945;
+  
+}
+
+
+body.dark-theme {
+    background-color: var(--bg);
+    font-size: $font-size-base;
+    header {
+    background-color: var(--element-bg);
+ 
+    }
+}
+
+header {
+    background-color: var(--element-bg);
+}
