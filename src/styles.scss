@@ -22,12 +22,14 @@
 body.dark-theme {
     background-color: var(--bg);
     font-size: $font-size-base;
-    header {
+    header, .search-container {
     background-color: var(--element-bg);
  
     }
+
+    
 }
 
-header {
+header, .search-container {
     background-color: var(--element-bg);
 }
