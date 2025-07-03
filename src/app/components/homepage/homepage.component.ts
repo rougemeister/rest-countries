@@ -3,7 +3,7 @@ import { HeaderComponent } from "../../shared/header/header.component";
 import { NavComponent } from "../../shared/nav/nav.component";
 import { CountryComponent } from "../country/country.component";
 import { Store } from '@ngrx/store';
-import { loadCountries } from '../../store/actions/countries.actions';
+import { loadCountries, setSearchQuery } from '../../store/actions/countries.actions';
 import { selectFilteredCountries, selectLoading, selectError } from '../../store/selectors/countries.selectors';
 import { AsyncPipe } from '@angular/common';
 
@@ -25,4 +25,7 @@ export class HomepageComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(loadCountries());
   }
+
+
+
 }
