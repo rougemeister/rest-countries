@@ -1,0 +1,12 @@
+@use '../../../styles/partials/variables' as * ;
+
+
+.search-container {
+    padding: 16px 32px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    border-radius: 5px;
+    box-shadow: $shadow-all;
+}
