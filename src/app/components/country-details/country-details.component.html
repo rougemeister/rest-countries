@@ -1,1 +1,55 @@
-<p>country-details works!</p>
+
+<app-header/>
+
+<main>
+<button class="go-back" (click)="goBack()">
+    
+    <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M5.81802 0.696699L6.87868 1.75736L3.3785 5.25754H16.7428L16.7428 6.74246H3.3785L6.87868 10.2426L5.81802 11.3033L0.514719 6L5.81802 0.696699Z" fill="currentColor"/>
+    </svg>
+    <div>Back</div>
+</button>
+<div class="country-details"
+ *ngIf="country$ | async as country">
+  <img [src]="country[0].flags.svg" [alt]="country[0].name.common" width="100">
+   <div class="info"> 
+    <h2>{{ country[0].name.common }}</h2>
+
+  <div class="basic-info">
+        <p><strong>Native Name:</strong>  {{
+             country[0]?.name?.nativeName
+           ? getFirstNativeOfficialName(country[0].name.nativeName)
+      : 'N/A'
+         }}</p>
+        <p><strong>Population:</strong> {{ country[0].population | commify }}</p>
+        <p><strong>Region:</strong> {{ country[0].region }}</p>
+        <p><strong>Sub Region:</strong> {{ country[0].subregion }}</p>
+        <p><strong>Capital:</strong> {{ country[0].capital[0] }}</p>
+    </div>
+    <div class="secondary-info">
+        <p><strong>Top Level Domain:</strong> {{ country[0].tld[0] }}</p>
+        <p><strong>Currency:</strong> {{
+            country[0]?.currencies
+            ? getFirstCurrencyInfo(country[0].currencies)
+            : 'N/A'
+             }}</p>
+             <p><strong>Languages:</strong>
+            {{ getLanguages(country[0]?.languages) }}
+         </p>
+
+    </div>
+    <div class="tertiary-info">
+        <h4>Border Countries</h4>
+        <div class="border-countries">
+        @for(country of country[0].borders; track country){
+            <p class="border">{{country}}</p>
+        }
+        </div>
+    </div>
+    </div>
+    
+
+
+
+</div>
+</main>

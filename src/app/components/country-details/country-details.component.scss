@@ -1,0 +1,83 @@
+@use '../../../styles/partials/variables' as *;
+
+button {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 32px;
+    width: 104px;
+    background-color: var(--element-bg);
+    box-shadow: $shadow-all;
+    border-radius: 5px;
+}
+
+main {
+    padding: 40px 28px;
+}
+
+.country-details {
+    overflow: hidden;
+    height: 100%;
+    width: 320px;
+    margin-top: 64px;
+
+
+    h2 {
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    p {
+        padding-bottom: 4px;
+    }
+
+    img {
+        width: 100%;
+        height: 229px;
+        border-radius: 5px;
+        overflow: hidden;
+
+    }
+
+
+    .content {
+        padding: 24px;
+    }
+}
+
+.info {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.tertiary-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.border-countries {
+    display: flex;
+    gap:10px;
+    flex-wrap: wrap;
+}
+
+.border {
+    width: 96px;
+    background-color: var(--element-bg);
+    box-shadow: $shadow-all;
+    text-align: center;
+    font-size: 12px;
+    height: 28px;
+    // width: 96px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}

@@ -1,4 +1,4 @@
-<div class="country">
+<div class="country" (click)="goToDetails(country?.cca3 ?? '')">
     <img [src]="country?.flags?.png" alt="">
     <div class="content">
         <h2>{{ country?.name?.common }}</h2>
