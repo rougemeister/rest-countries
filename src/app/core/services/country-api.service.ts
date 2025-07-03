@@ -9,7 +9,8 @@ import { CACHED_KEY, API_URL } from '../constants/constants';
 export class CountryApiService {
   private memoryCache: Country[] | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
 
   getAllCountries(): Observable<Country[]> {
     if (this.memoryCache) return of(this.memoryCache);

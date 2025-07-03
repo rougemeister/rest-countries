@@ -2,6 +2,12 @@
     <app-header/>
     <main>
         <app-nav/>
+        <div class="countries-container">
+            @for(country of countries$ | async; track country.cca3) {
+                <app-country [country]="country"></app-country>
+            }
+        
+        </div>
     </main>
 
 </div>
