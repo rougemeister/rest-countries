@@ -34,8 +34,14 @@ export interface CountryLanguageInfo {
 }
 
 export interface CountryBorderInfo {
-  borders: string[]; 
-  cca3: string; 
+  borders: string[];
+  cca3: string;
+}
+
+export interface CountryFlags {
+  png: string;
+  svg: string;
+  alt?: string;
 }
 
 export interface Country
@@ -43,5 +49,6 @@ export interface Country
     CountryDomainInfo,
     CountryCurrencyInfo,
     CountryLanguageInfo,
-    CountryBorderInfo {}
-
+    CountryBorderInfo {
+  flags: CountryFlags; 
+}
