@@ -12,10 +12,10 @@ button {
     box-shadow: $shadow-all;
     border-radius: 5px;
 }
-
 main {
     padding: 40px 28px;
 }
+
 
 .country-details {
     overflow: hidden;
@@ -36,7 +36,7 @@ main {
 
     img {
         width: 100%;
-        height: 229px;
+        height: auto;
         border-radius: 5px;
         overflow: hidden;
 
@@ -73,11 +73,41 @@ main {
     box-shadow: $shadow-all;
     text-align: center;
     font-size: 12px;
-    height: 28px;
-    // width: 96px;
     align-items: center;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
+    padding: 5px;
+}
+
+
+@media screen and (min-width: 1025px) {
+    main {
+        max-width: 1200px;
+        padding: 80px;
+        margin: auto;
+    }
+
+    // .info {
+    //     justify-content: center;
+    // }
+    .country-details {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 145px;
+        img {
+            width: auto;
+            height: auto;
+        }
+    }
+    .info-content-wrapper {
+        display: flex;
+        gap: 24px;
+        width: 100%;
+    }
+
+    
 }

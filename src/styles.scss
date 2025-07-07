@@ -19,13 +19,14 @@
 }
 
 
+* {
+    font-size: $font-size-base;
+}
+
 body.dark-theme {
     background-color: var(--bg);
-    font-size: $font-size-base;
-    header, .search-container {
-    background-color: var(--element-bg);
- 
-    }
+
+    
 
     
 }
