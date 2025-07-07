@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { loadTheme } from './store/actions/theme.actions';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +10,10 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'rest-countries';
+export class AppComponent implements OnInit {
+  constructor(private store: Store) {}
+
+  ngOnInit() {
+    this.store.dispatch(loadTheme());
+  }
 }
