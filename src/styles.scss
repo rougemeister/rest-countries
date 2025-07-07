@@ -31,6 +31,9 @@ body.dark{
     
 }
 
+svg {
+  stroke: currentColor;
+}
 header, .search-container {
     background-color: var(--element-bg);
 }
