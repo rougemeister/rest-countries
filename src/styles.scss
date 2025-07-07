@@ -10,7 +10,7 @@
   --input-bg: #8585851a;
 }
 
-.dark-theme {
+.dark {
   --bg: #202C36;
   --element-bg: #2b3945;
   --text: #ffffff;
@@ -23,7 +23,7 @@
     font-size: $font-size-base;
 }
 
-body.dark-theme {
+body.dark{
     background-color: var(--bg);
 
     
