@@ -82,7 +82,12 @@ main {
 }
 
 
-@media screen and (min-width: 1025px) {
+ .secondary-info {
+      margin-top: 32px;
+    }
+
+
+@media screen and (min-width: 768px) {
     main {
         max-width: 1200px;
         padding: 80px;
@@ -99,7 +104,7 @@ main {
         width: 100%;
         gap: 145px;
         img {
-            width: auto;
+            width: 400px;
             height: auto;
         }
     }
@@ -107,6 +112,9 @@ main {
         display: flex;
         gap: 24px;
         width: 100%;
+    }
+    .secondary-info {
+        margin-top: 0;
     }
 
     
