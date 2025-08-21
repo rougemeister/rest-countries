@@ -44,47 +44,47 @@ jobs:
     - name: Build Angular application
       run: |
         echo "Building rest-countries app for production..."
+        echo "Using Angular 17+ with public folder structure"
         npm run build
         echo "Build completed. Checking output directory structure..."
-        ls -la dist/
-        echo "Contents of dist/rest-countries:"
-        ls -la dist/rest-countries/ || echo "Directory structure might be different"
+        echo "Contents of dist/:"
+        ls -la dist/ || echo "dist directory not found"
+        echo "Contents of dist/rest-countries/:"
+        ls -la dist/rest-countries/ || echo "dist/rest-countries directory not found"
+        echo "Looking for browser subdirectory (new Angular structure):"
+        ls -la dist/rest-countries/browser/ || echo "browser subdirectory not found"
 
-    # Verify build output exists (flexible check for different Angular builders)
+    # Verify build output exists (Angular 17+ with public folder)
     - name: Verify build output
       run: |
-        echo "🔍 Checking build output structure..."
+        echo "🔍 Checking Angular 17+ build output structure..."
         
-        # Check if dist directory exists
-        if [ ! -d "dist" ]; then
-          echo "❌ dist directory not found!"
-          exit 1
-        fi
-        
-        # Find the actual output directory
-        if [ -d "dist/rest-countries" ]; then
+        # Check for new Angular application builder output structure
+        if [ -d "dist/rest-countries/browser" ] && [ -f "dist/rest-countries/browser/index.html" ]; then
+          BUILD_DIR="dist/rest-countries/browser"
+          echo "✅ Found Angular 17+ browser output: $BUILD_DIR"
+        elif [ -d "dist/rest-countries" ] && [ -f "dist/rest-countries/index.html" ]; then
           BUILD_DIR="dist/rest-countries"
+          echo "✅ Found standard output: $BUILD_DIR"
         elif [ -d "dist" ] && [ -f "dist/index.html" ]; then
           BUILD_DIR="dist"
+          echo "✅ Found root dist output: $BUILD_DIR"
         else
-          echo "❌ Could not find build output directory!"
-          echo "Available directories in dist/:"
-          ls -la dist/ || echo "dist directory is empty or doesn't exist"
-          exit 1
-        fi
-        
-        echo "✅ Found build directory: $BUILD_DIR"
-        
-        # Check for index.html
-        if [ ! -f "$BUILD_DIR/index.html" ]; then
-          echo "❌ index.html not found in $BUILD_DIR!"
-          echo "Contents of $BUILD_DIR:"
-          ls -la "$BUILD_DIR/"
+          echo "❌ Could not find build output directory with index.html!"
+          echo "Checking all possible locations..."
+          echo "Contents of dist/:"
+          find dist/ -name "index.html" -type f 2>/dev/null || echo "No index.html found anywhere in dist/"
+          echo "Full directory structure:"
+          find dist/ -type f | head -20 || echo "No files found in dist/"
           exit 1
         fi
         
         echo "✅ Build verification passed"
         echo "BUILD_OUTPUT_DIR=$BUILD_DIR" >> $GITHUB_ENV
+        
+        # Show what files will be deployed
+        echo "📁 Files that will be deployed:"
+        ls -la "$BUILD_DIR" | head -10
 
     # Configure AWS credentials
     - name: Configure AWS credentials
