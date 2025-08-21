@@ -1,11 +1,9 @@
-name: Deploy Rest Countries App to AWS S3 and CloudFront
+name: Deploy Angular App to AWS S3 + CloudFront
 
-# Trigger deployment only on push to main branch
 on:
   push:
     branches: [ main ]
 
-# Environment variables
 env:
   NODE_VERSION: '20'
   AWS_REGION: 'eu-north-1'
@@ -13,204 +11,45 @@ env:
   S3_BUCKET: 'kruzzstaticbucket'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    # Checkout the repository code
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # Setup Node.js environment
-    - name: Setup Node.js ${{ env.NODE_VERSION }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-    # Install dependencies
-    - name: Install dependencies
-      run: npm ci
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-    # Optional: Run tests (uncomment if you have tests)
-    # - name: Run unit tests
-    #   run: npm run test -- --watch=false --browsers=ChromeHeadless
+      - name: Install dependencies
+        run: npm ci
 
-    # Optional: Run linting (uncomment if you use ESLint)
-    # - name: Run ESLint
-    #   run: npm run lint
+      - name: Build Angular project
+        run: npm run build -- --configuration production
 
-    # Build Angular application for production
-    - name: Build Angular application
-      run: |
-        echo "Building rest-countries app for production..."
-        echo "Using Angular 17+ with public folder structure"
-        npm run build
-        echo "Build completed. Checking output directory structure..."
-        echo "Contents of dist/:"
-        ls -la dist/ || echo "dist directory not found"
-        echo "Contents of dist/rest-countries/:"
-        ls -la dist/rest-countries/ || echo "dist/rest-countries directory not found"
-        echo "Looking for browser subdirectory (new Angular structure):"
-        ls -la dist/rest-countries/browser/ || echo "browser subdirectory not found"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    # Verify build output exists (Angular 17+ with public folder)
-    - name: Verify build output
-      run: |
-        echo "🔍 Checking Angular 17+ build output structure..."
-        
-        # Check for new Angular application builder output structure
-        if [ -d "dist/rest-countries/browser" ] && [ -f "dist/rest-countries/browser/index.html" ]; then
-          BUILD_DIR="dist/rest-countries/browser"
-          echo "✅ Found Angular 17+ browser output: $BUILD_DIR"
-        elif [ -d "dist/rest-countries" ] && [ -f "dist/rest-countries/index.html" ]; then
-          BUILD_DIR="dist/rest-countries"
-          echo "✅ Found standard output: $BUILD_DIR"
-        elif [ -d "dist" ] && [ -f "dist/index.html" ]; then
-          BUILD_DIR="dist"
-          echo "✅ Found root dist output: $BUILD_DIR"
-        else
-          echo "❌ Could not find build output directory with index.html!"
-          echo "Checking all possible locations..."
-          echo "Contents of dist/:"
-          find dist/ -name "index.html" -type f 2>/dev/null || echo "No index.html found anywhere in dist/"
-          echo "Full directory structure:"
-          find dist/ -type f | head -20 || echo "No files found in dist/"
-          exit 1
-        fi
-        
-        echo "✅ Build verification passed"
-        echo "BUILD_OUTPUT_DIR=$BUILD_DIR" >> $GITHUB_ENV
-        
-        # Show what files will be deployed
-        echo "📁 Files that will be deployed:"
-        ls -la "$BUILD_DIR" | head -10
+      - name: Deploy to S3
+        run: |
+          aws s3 sync dist/${{ env.ANGULAR_PROJECT_NAME }}/browser s3://${{ env.S3_BUCKET }} --delete
 
-    # Configure AWS credentials
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-    # Deploy static files to S3
-    - name: Deploy to S3
-      run: |
-        echo "🚀 Starting deployment to S3 bucket: ${{ env.S3_BUCKET }}"
-        echo "📁 Using build directory: $BUILD_OUTPUT_DIR"
-        
-        # Sync all files to S3 with default cache control
-        aws s3 sync $BUILD_OUTPUT_DIR s3://${{ env.S3_BUCKET }} \
-          --delete \
-          --cache-control "max-age=86400" \
-          --exclude "*.js" \
-          --exclude "*.css" \
-          --exclude "*.woff*" \
-          --exclude "*.ttf" \
-          --exclude "*.eot" \
-          --exclude "*.otf" \
-          --exclude "*.png" \
-          --exclude "*.jpg" \
-          --exclude "*.jpeg" \
-          --exclude "*.gif" \
-          --exclude "*.svg" \
-          --exclude "*.ico"
-        
-        echo "📦 Main files uploaded with 1-day cache"
-
-    # Set long cache headers for hashed JS and CSS files
-    - name: Set cache headers for JS and CSS files
-      run: |
-        echo "⚡ Setting long cache headers for JS and CSS files..."
-        aws s3 cp s3://${{ env.S3_BUCKET }} s3://${{ env.S3_BUCKET }} \
-          --recursive \
-          --exclude "*" \
-          --include "*.js" \
-          --include "*.css" \
-          --cache-control "max-age=31536000" \
-          --metadata-directive REPLACE
-        
-        echo "✅ JS and CSS files cached for 1 year"
-
-    # Set cache headers for font files
-    - name: Set cache headers for fonts
-      run: |
-        echo "🔤 Setting cache headers for font files..."
-        aws s3 cp s3://${{ env.S3_BUCKET }} s3://${{ env.S3_BUCKET }} \
-          --recursive \
-          --exclude "*" \
-          --include "*.woff*" \
-          --include "*.ttf" \
-          --include "*.eot" \
-          --include "*.otf" \
-          --cache-control "max-age=31536000" \
-          --metadata-directive REPLACE
-        
-        echo "✅ Font files cached for 1 year"
-
-    # Set cache headers for images and icons
-    - name: Set cache headers for images
-      run: |
-        echo "🖼️ Setting cache headers for images..."
-        aws s3 cp s3://${{ env.S3_BUCKET }} s3://${{ env.S3_BUCKET }} \
-          --recursive \
-          --exclude "*" \
-          --include "*.png" \
-          --include "*.jpg" \
-          --include "*.jpeg" \
-          --include "*.gif" \
-          --include "*.svg" \
-          --include "*.ico" \
-          --cache-control "max-age=2592000" \
-          --metadata-directive REPLACE
-        
-        echo "✅ Images cached for 30 days"
-
-    # Set special cache headers for index.html (no cache)
-    - name: Set no-cache for index.html
-      run: |
-        echo "📄 Setting no-cache for index.html..."
-        aws s3 cp s3://${{ env.S3_BUCKET }}/index.html s3://${{ env.S3_BUCKET }}/index.html \
-          --cache-control "no-cache, no-store, must-revalidate" \
-          --metadata-directive REPLACE
-        
-        echo "✅ index.html set to no-cache"
-
-    # Invalidate CloudFront distribution
-    - name: Invalidate CloudFront cache
-      run: |
-        echo "🔄 Creating CloudFront invalidation..."
-        INVALIDATION_OUTPUT=$(aws cloudfront create-invalidation \
-          --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-          --paths "/*" \
-          --output json)
-        
-        INVALIDATION_ID=$(echo $INVALIDATION_OUTPUT | jq -r '.Invalidation.Id')
-        echo "✅ CloudFront invalidation created: $INVALIDATION_ID"
-        echo "⏳ Invalidation may take 5-15 minutes to complete"
-
-    # Display deployment summary
-    - name: Deployment Summary
-      run: |
-        echo ""
-        echo "🎉 ===== DEPLOYMENT COMPLETED SUCCESSFULLY ====="
-        echo ""
-        echo "📊 Deployment Details:"
-        echo "   🚀 Project: rest-countries"
-        echo "   📦 S3 Bucket: ${{ env.S3_BUCKET }}"
-        echo "   🌍 Region: ${{ env.AWS_REGION }}"
-        echo "   🌐 CloudFront: https://${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}.cloudfront.net"
-        echo ""
-        echo "⏰ Cache Settings Applied:"
-        echo "   📄 HTML files: No cache"
-        echo "   ⚡ JS/CSS files: 1 year (31536000s)"
-        echo "   🔤 Font files: 1 year (31536000s)"
-        echo "   🖼️ Images: 30 days (2592000s)"
-        echo "   📁 Other files: 1 day (86400s)"
-        echo ""
-        echo "🔗 Your app should be available at:"
-        echo "   https://${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}.cloudfront.net"
-        echo ""
-        echo "⚠️  Note: CloudFront invalidation may take 5-15 minutes"
-        echo "================================================"
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.DISTRIBUTION_ID }} \
+            --paths "/*"
